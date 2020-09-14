@@ -114,7 +114,7 @@ class _VideoPageState extends State<VideoPage> {
                     'What are your 5 most liked songs',
                     style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         backgroundColor: Colors.orange,
                         fontSize: 25),
                     textAlign: TextAlign.center,

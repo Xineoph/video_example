@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 40,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -56,9 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           padding: EdgeInsets.only(top: 15),
           child: Text(
-            ("drag to open"),
+            ("drag or tap to open"),
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
           ),
         ),
       ),
