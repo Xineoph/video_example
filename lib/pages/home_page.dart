@@ -14,7 +14,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double heightData = MediaQuery.of(context).size.height;
 
-
     return Scaffold(
       body: SlidingUpPanel(
         maxHeight: heightData,
@@ -32,7 +31,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(
                 ("Home"),
                 style: TextStyle(
-                    fontFamily: 'TT Hoves',
                     color: Colors.white,
                     fontSize: 40,
                     fontWeight: FontWeight.bold),
@@ -60,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text(
             ("drag to open"),
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'TT Hoves', color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
       ),

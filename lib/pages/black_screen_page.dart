@@ -13,8 +13,9 @@ class BlackScreenPage extends StatelessWidget {
         child: Text(
           title,
           style: TextStyle(
-            fontFamily: 'TT Hoves',
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 30),
         ),
       ),
     ));

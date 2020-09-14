@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:video_test/pages/black_screen_page.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_test/widgets/user_row_widget.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:swipedetector/swipedetector.dart';
+import 'package:video_test/widgets/video_prewiew_widgets.dart';
+import 'package:video_test/widgets/video_widgets.dart';
 
 class VideoPage extends StatefulWidget {
   final Function func;
@@ -12,6 +17,11 @@ class VideoPage extends StatefulWidget {
 class _VideoPageState extends State<VideoPage> {
   Future<void> _initializeVideoPlayerFuture;
   VideoPlayerController _controller;
+  List<String> videoLink = [
+    'assets/video/unicorns.mp4',
+    'assets/video/cake.mp4'
+  ];
+  int videoIndex = 0;
 
   @override
   void initState() {
@@ -22,12 +32,22 @@ class _VideoPageState extends State<VideoPage> {
     _controller.dispose();
     super.dispose();
   }
+  void changeVideoSwipe(int newIndex) {
+    setState(() {
+      _controller.pause();
+      videoIndex = newIndex;
+      _controller = VideoPlayerController.asset(videoLink[newIndex]);
+      _initializeVideoPlayerFuture = _controller.initialize();
+      _controller.play();
+    });
+  }
 
   VideoPlayerController videoController(String link) {
     if (_controller == null) {
       _controller = VideoPlayerController.asset(link);
       _initializeVideoPlayerFuture = _controller.initialize();
       _controller.play();
+      _controller.setLooping(true);
     }
     return _controller;
   }
@@ -35,24 +55,37 @@ class _VideoPageState extends State<VideoPage> {
   @override
   Widget build(BuildContext context) {
     double deviceWidthData = MediaQuery.of(context).size.width;
-    videoController('assets/video/cake.mp4');
+    videoController(videoLink[videoIndex]);
     return Stack(
       children: [
-        Container(
-          child: FutureBuilder(
-            future: _initializeVideoPlayerFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Container(
-                  child: VideoPlayer(videoController('assets/video/cake.mp4')),
-                );
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
+        Swiper(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+              child: FutureBuilder(
+                future: _initializeVideoPlayerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    int newIndex = videoIndex == 0 ? 1 : 0;
+                    Function swipe = () => changeVideoSwipe(newIndex);
+
+                    return SwipeDetector(
+                      onSwipeLeft: swipe,
+                      onSwipeRight: swipe,
+                      child: Container(
+                        child: VideoPlayer(videoController(videoLink[index])),
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            );
+          },
+          itemCount: videoLink.length,
         ),
         Positioned(
           top: 20,
@@ -96,120 +129,31 @@ class _VideoPageState extends State<VideoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _userInfoRow(),
+              UserRowWidget(),
               SizedBox(
                 height: 15,
               ),
-              Container(
-                height: 110,
-                child: _answersRow(),
-              ),
+              Row(
+                children: [
+                  Container(
+                    height: 110,
+                    child: VideoPreviewWidget(),
+                  ),
+                  Container(
+                      width: deviceWidthData - 100,
+                      child: Row(
+                        children: [
+                          VideoButton(func1:() => changeVideoSwipe(0),
+                          func2:() => changeVideoSwipe(1)),
+                        ],
+                      ))
+                ],
+              )
             ],
           ),
         ),
       ],
     );
   }
-
-  Widget _userInfoRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 1, horizontal: 10),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlackScreenPage('User info'),
-                ),
-              );
-            },
-            child: Row(children: [
-              Container(
-                padding: EdgeInsets.only(right: 5),
-                child: CircleAvatar(
-                 backgroundImage: AssetImage("assets/images/cat.jpg"),
-                ),
-              ),
-              Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(
-                  'Wendy<OMarley',
-                  style: TextStyle(fontFamily: 'TT Hoves', color: Colors.white),
-                ),
-                Text(
-                  '1 day ago',
-                  style: TextStyle(fontFamily: 'TT Hoves', color: Colors.white),
-                )
-              ])
-            ]),
-          ),
-        ),
-        SizedBox(
-          width: 50,
-        ),
-        Container(
-          height: 50,
-          child: Image.asset('assets/images/userActions.png'),
-        ),
-      ],
-    );
-  }
-
-  Widget _answersRow() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlackScreenPage('Add Answer'),
-              ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.only(left: 10),
-            height: 100,
-            child: Image.asset('assets/images/addAnswer.png'),
-          ),
-        ),
-        _gorizontalVideo(context),
-      ],
-    );
-  }
-
-  Widget _gorizontalVideo(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.only(left: 10.0),
-        height: 100.0,
-        child: Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: <Widget>[
-                _videoPreview('assets/video/unicorn.mp4'),
-                _videoPreview('assets/video/lake.mp4'),
-                _videoPreview('assets/video/cake.mp4')
-              ],
-            ),
-          ),
-        ));
-  }
-
-  Widget _videoPreview(String path) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: EdgeInsets.symmetric(horizontal: 3),
-          height: 100.0,
-          width: 70.0,
-          child: VideoPlayer(videoController(path))),
-    );
-  }
+  
 }
